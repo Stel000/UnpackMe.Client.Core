@@ -17,37 +17,50 @@ namespace UnpackMe.Client.Core
                 // Retrieve the list of available commands for your login/password
                 CommandModel[] commands = unpackMeClient.GetAvailableCommands();
                 CommandModel decryptCommand = commands.SingleOrDefault(x => x.CommandTitle == "Pangya TH *.iff decrypt");
-
-                // Open the file to unpack
-                FileStream fileStream = new FileStream(
-                    @"C:\UnpackMe\pangya.iff",
-                    FileMode.Open
-                );
+                string rootPath = @"C:\UnpackMe\pangya.iff";
+                DirectoryInfo root = new DirectoryInfo(rootPath);
+                if(root.Exists)
+                {
+                    FileInfo[] fileList = root.GetFiles();
+                }
+                foreach (FileInfo f in fileList)
+                {
+                    string[] fileNameList = f.FullName
+                }
+                foreach (string fileName in fileNameList)
+                {
+                    // Open the file to unpack
+                    FileStream fileStream = new FileStream(
+                        fileName,
+                        FileMode.Open
+                    );
 
                 // Create an unpack task with the file
-                string taskId = unpackMeClient.CreateTaskFromCommandId(decryptCommand.CommandId, fileStream);
+                    string taskId = unpackMeClient.CreateTaskFromCommandId(decryptCommand.CommandId, fileStream);
 
                 // Check for unpack status
-                TaskModel task;
-                string taskStatus;
-                do
-                {
-                    task = unpackMeClient.GetTaskById(taskId);
-                    taskStatus = task.TaskStatus;
+                    TaskModel task;
+                    string taskStatus;
+                    do
+                    {
+                        task = unpackMeClient.GetTaskById(taskId);
+                        taskStatus = task.TaskStatus;
 
-                    System.Threading.Thread.Sleep(1000);
+                        System.Threading.Thread.Sleep(1000);
 
-                    Console.WriteLine(taskStatus);
+                        Console.WriteLine(taskStatus);
 
-                } while (taskStatus != "completed");
+                    } while (taskStatus != "completed");
 
-                // When unpacked file is ready, Save the result into a file
-                unpackMeClient.SaveTaskFileTo(
-                    taskId,
-                    @"C:\UnpackMe\pangya.iff.dec"
-                );
+                    // When unpacked file is ready, Save the result into a file
+                    unpackMeClient.SaveTaskFileTo(
+                        taskId,
+                        fileName + ".dec"
+                    );
 
-                Console.WriteLine("should be unpacked now o_O");
+                    Console.WriteLine("should be unpacked now o_O");
+                }
+                Console.WriteLine("所有文件已完成转换");
             }
         }
     }
